@@ -2,3 +2,12 @@
 
 **/__pycached__
 
+# vertial environment
+venv
+.venv
+
+# plots
+*.png
+*.pdf
+*.jpeg
+*.jpg

@@ -1,0 +1,16 @@
+train:
+  epochs: 20000
+  learning_rate: 0.0001
+  optimizer: adam
+
+model:
+  hidden_layers: 3
+  hidden_units: 32
+  activation: tanh
+
+physics:
+  type: Klein-Gordon
+  parameters:
+    m: 5.1e-5
+    phi_init: 20.0
+    phi_dot_init: 0.0

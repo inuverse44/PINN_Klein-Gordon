@@ -1,0 +1,7 @@
+pillow
+numpy
+torch
+matplotlib
+
+# config
+pyyaml
