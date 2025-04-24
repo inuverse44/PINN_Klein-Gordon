@@ -5,22 +5,10 @@ import matplotlib.pyplot as plt
 from PINN_KG.gif import save_gif_PIL
 from PINN_KG import plot
 from PINN_KG.neural_network import FullyConnectedNetwork
-
-def oscillator(d, w0, x):
-        """Defines the analytical solution to the 1D underdamped harmonic oscillator problem. 
-        Equations taken from: https://beltoforion.de/en/harmonic_oscillator/"""
-        assert d < w0
-        w = np.sqrt(w0**2-d**2)
-        phi = np.arctan(-d/w)
-        A = 1/(2*np.cos(phi))
-        cos = torch.cos(phi+w*x)
-        sin = torch.sin(phi+w*x)
-        exp = torch.exp(-d*x)
-        y  = exp*2*A*cos
-        return y
+from PINN_KG.physics.physics import klein_gordon_equation
 
 def main_KG():
-    d, w0 = 2, 20
+
 
     # get the analytical solution over the full domain
     x = torch.linspace(0,1,500).view(-1,1)
@@ -36,7 +24,6 @@ def main_KG():
 
 
     x_physics = torch.linspace(0,1,100).view(-1,1).requires_grad_(True)# sample locations over the problem domain
-    mu, k = 2*d, w0**2
 
     torch.manual_seed(123)
     model = FullyConnectedNetwork(1,1,32,3)
@@ -47,14 +34,14 @@ def main_KG():
     total_loss_history = []
     physics_loss_history = []
     initial_loss_history = []
-    for i in range(1000):
+    for i in range(10000):
         optimizer.zero_grad()
                 
         # compute the "physics loss"
         yhp = model(x_physics)
         dx  = torch.autograd.grad(yhp, x_physics, torch.ones_like(yhp), create_graph=True)[0]# computes dy/dx
         dx2 = torch.autograd.grad(dx,  x_physics, torch.ones_like(dx),  create_graph=True)[0]# computes d^2y/dx^2
-        residual = dx2 + mu*dx + k*yhp# computes the residual of the 1D harmonic oscillator differential equation
+        residual = klein_gordon_equation(yhp, dx, dx2)
         physics_loss = torch.mean(residual**2)
     
         # compute the "initial condition loss"
