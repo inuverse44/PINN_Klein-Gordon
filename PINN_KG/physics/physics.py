@@ -26,6 +26,13 @@ def potential(x):
     """
     return 0.5 * m**2 * x**2;
 
+# 自動微分で計算したい
+def d_potential(x):
+    """
+    Defines the quadratic potential
+    """
+    return m**2 * x;
+
 def hubble(x, dx):
     """
     Defines the Hubble parameter in terms of e-folds number
@@ -35,5 +42,27 @@ def hubble(x, dx):
     h = torch.sqrt(h2)
     return h
 
+def srp_epsilon(x):
+    """
+    Defines the first-order slow-roll parameter for the potential.
+    The prefix "srp" represents "slow-roll parameter".
+
+    x: field value
+    """
+    v = potential(x)
+    dv = d_potential(x)
+    eps = 0.5 * (dv / v)**2
+    return eps
+
+
 def klein_gordon_equation(x, dx, dx2):
+    dv = d_potential(x)
+    h = hubble(x, dx)
+    e = srp_epsilon(x)
+    eq = dx2 + (3 - e)*dx + dv/h**2
+    return eq
+
+
+def harmonic_oscillator_equation(x, dx, dx2):
     return dx2 + mu*dx + k*x
+    

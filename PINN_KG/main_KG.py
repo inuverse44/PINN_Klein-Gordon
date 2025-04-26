@@ -6,12 +6,13 @@ from PINN_KG.gif import save_gif_PIL
 from PINN_KG import plot
 from PINN_KG.neural_network import FullyConnectedNetwork
 from PINN_KG.physics.physics import klein_gordon_equation
+from PINN_KG.physics.physics import harmonic_oscillator_equation
 
 def main_KG():
 
 
     # get the analytical solution over the full domain
-    x = torch.linspace(0,1,500).view(-1,1)
+    x = torch.linspace(0,20,1000).view(-1,1)
     # y = oscillator(d, w0, x).view(-1,1)
     
     # slice out a small number of points from the LHS of the domain
@@ -23,11 +24,11 @@ def main_KG():
     """=================================================="""
 
 
-    x_physics = torch.linspace(0,1,100).view(-1,1).requires_grad_(True)# sample locations over the problem domain
+    x_physics = torch.linspace(0,20,1000).view(-1,1).requires_grad_(True)# sample locations over the problem domain
 
     torch.manual_seed(123)
     model = FullyConnectedNetwork(1,1,32,3)
-    optimizer = torch.optim.Adam(model.parameters(),lr=5e-3)
+    optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
     files = []
 
     # for loss history
@@ -48,7 +49,7 @@ def main_KG():
         x0 = torch.zeros(1,1, requires_grad=True)
         y0 = model(x0)
         dy0 = torch.autograd.grad(y0, x0, torch.ones_like(y0), create_graph=True)[0]
-        initial_loss = (y0 - 1.0)**2 + (dy0 - 0.0)**2
+        initial_loss = (y0 - 16.0)**2 + (dy0 - 0.0)**2
 
         # final loss
         loss = 1e-4*physics_loss + 1e0*initial_loss
