@@ -2,20 +2,38 @@ import matplotlib.pyplot as plt
 import torch
 
 def result(i, x, yh, y=None, xp=None):
-    "Pretty plot training results"
+    "Pretty plot training results with axes and ticks"
     plt.figure(figsize=(8,4))
-    plt.plot(x,yh, color="tab:blue", linewidth=4, alpha=0.8, label="Neural network prediction")
+    
+    # ニューラルネットの予測
+    plt.plot(x, yh, color="tab:blue", linewidth=4, alpha=0.8, label="Neural network prediction")
+    
+    # 正解データがあれば描画
     if y is not None:
-        plt.plot(x,y, color="grey", linewidth=2, alpha=0.8, label="Exact solution")
+        plt.plot(x, y, color="grey", linewidth=2, alpha=0.8, label="Exact solution")
+    
+    # 物理ロスのサンプリングポイントがあれば描画
     if xp is not None:
-        plt.scatter(xp, -0*torch.ones_like(xp), s=60, color="tab:green", alpha=0.4, 
-                    label='Physics loss training locations')
+        plt.scatter(xp, torch.zeros_like(xp), s=60, color="tab:green", alpha=0.4, label='Physics loss training locations')
+    
+    # 凡例
     l = plt.legend(loc=(1.01,0.34), frameon=False, fontsize="large")
     plt.setp(l.get_texts(), color="k")
-    plt.xlim(-0.05, 1.05)
-    plt.ylim(-1.1, 1.1)
-    plt.text(1.065,0.7,"Training step: %i"%(i+1),fontsize="xx-large",color="k")
-    plt.axis("off")
+    
+    # 軸設定
+    #plt.xlim(-0.05, 1.05)
+    #plt.ylim(-1.1, 1.1)
+    plt.xlabel("x", fontsize=14)
+    plt.ylabel("y", fontsize=14)
+    
+    # トレーニングステップ数を右上に表示
+    plt.text(1.07, 0.9, f"Step: {i+1}", fontsize="x-large", color="k")
+    
+    # グリッド追加
+    plt.grid(True, linestyle="--", alpha=0.5)
+
+    # 軸を消さずにそのまま表示
+
 
 
 def loss_history(*loss_histories, labels=None, title="Loss History", log_scale=True, filename=None):
